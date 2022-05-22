@@ -1,4 +1,4 @@
-import { randomInt, randomElement } from "./sentence.js";
+import { randomInt, randomElement } from "./lib/util.js";
 
 export const noMuchWords = (ctx) => ctx.reply("В базе недостаточно слов для генерации! Обучение происходит по мере отправки вами сообщений в беседу!");
 export const internalError = (ctx) => ctx.reply("Произошла ошибка... Попробуйте позже");

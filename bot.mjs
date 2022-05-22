@@ -14,6 +14,8 @@ import Moderate from "./src/moderate.js";
 
 import Static, { internalError } from "./src/static.js";
 
+import { SafeRegExp } from "./src/lib/util.js";
+
 export const Config = {
     version: "4.0.0",
     shouldUpdate: false,
@@ -122,9 +124,12 @@ const Bot = new API({
 
             var isHookTriggered = false;
             const useCommand = (command, cb) => {
-                var regex = new RegExp(`^(\/|!)(д|d) ${command}`, "ig");
+                const safe = new RegExp(
+                    `^(\/|!)(д|d) ` + SafeRegExp.parse(command), 
+                    "ig"
+                );
 
-                if (regex.test(text) && !isHookTriggered) {
+                if (safe.test(text) && !isHookTriggered) {
                     isHookTriggered = true;
                     return cb(ctx);
                 }
@@ -154,7 +159,10 @@ const Bot = new API({
                 "word": ctx => Sentence.buildRandom(ctx)
             }
 
-            Object.keys(available).map(command => useCommand(command, available[command]));
+            Object.keys(available).map(command => {
+                if (isHookTriggered) return;
+                useCommand(command, available[command])
+            });
 
             if (!isHookTriggered) return buildSentence(ctx);
             return false;

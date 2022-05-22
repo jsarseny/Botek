@@ -5,6 +5,7 @@ import VK from "./vk.js"
 import Bot from "../bot.mjs";
 import Explore from "./explore.js";
 import DataBase from "./lib/db.js";
+import Sentence from "./sentence.js";
 
 import Images, { 
     getBufferByUrl 
@@ -15,14 +16,14 @@ import Static, {
     onlyGroupAvailable 
 } from "./static.js";
 
-import Sentence, { 
+import { 
     chance, 
     randomInt,  
     useGroupChat,
     shuffleArray,
     randomElement,
     sliceCommandPart
-} from "./sentence.js";
+} from "./lib/util.js";
 
 export const morphy = new Morphy("ru", {
     storage: Morphy.STORAGE_MEM,

@@ -4,7 +4,7 @@ import Syntax from "./syntax.js";
 import DataBase from "./lib/db.js";
 
 import { Config } from "../bot.mjs";
-import { fileSize } from "./sentence.js";
+import { fileSize } from "./lib/util.js";
 import { internalError } from "./static.js";
 
 const hashText = (text, string, seed) => {

@@ -3,16 +3,17 @@ import DataBase from "./lib/db.js";
 import { Config } from "../bot.mjs";
 import { 
     chance, 
+    SafeRegExp,
     useGroupChat,
-    randomElement
-} from "./sentence.js";
+    randomElement,
+} from "./lib/util.js";
 
 // NEURAL CONFIG
 const MEMORY_CHANCE = 35;
 const BOT_MEMORY_CHANCE = 20;
 const ATTACHMENT_MEMORY_CHANCE = 40;
 
-const NEURAL_REPLY_CHANCE = 60;
+const NEURAL_REPLY_CHANCE = 59;
 
 const NODE_DISPATCH_THRESHOLD = 2;
 const ATTACHMENT_DISPATCH_THRESHOLD = 1;
@@ -150,8 +151,8 @@ const getPhraseIndex = async (text, mode = "default") => {
 
             let isTriggered = false;
 
-            const includesRegexp = new RegExp(phrase, "ig");
-            const wrapRegexp = new RegExp(text, "ig");
+            const includesRegexp = new SafeRegExp(phrase, "ig");
+            const wrapRegexp = new SafeRegExp(text, "ig");
 
             isTriggered = wrapRegexp.test(phrase);
 

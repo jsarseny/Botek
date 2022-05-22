@@ -1,11 +1,12 @@
 import VK from "./vk.js";
 import Bot from "../bot.mjs";
 import DataBase from "./lib/db.js";
+import Sentence from "./sentence.js";
 import GoogleTTS from "google-tts-api";
 
 import Syntax, { customFormParser } from "./syntax.js";
-import Sentence, { randomElement } from "./sentence.js";
 
+import { randomElement } from "./lib/util.js";
 import { internalError } from "./static.js";
 
 const deployBase64 = async (base64, peer_id) => {

@@ -1,7 +1,7 @@
 import restler from "restler";
 
 import { callLimitExceeded } from "./static.js";
-import { sliceCommandPart, upperFirst } from "./sentence.js";
+import { sliceCommandPart, upperFirst } from "./lib/util.js";
 
 const WEATHER_CALL_LIMIT = 58; // per min
 const WEATHER_API_KEY = "cca2238b3b47b33135b3e16f85d17142";

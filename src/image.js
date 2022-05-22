@@ -3,7 +3,7 @@ import Jimp from "jimp";
 import Canvas from "canvas";
 import Static from "./static.js";
 
-import { randomElement, randomInt, sliceCommandPart } from "./sentence.js";
+import { randomElement, randomInt, sliceCommandPart } from "./lib/util.js";
 
 const { 
     loadImage,
