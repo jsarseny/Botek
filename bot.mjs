@@ -1,4 +1,5 @@
 import API from "node-vk-bot-api";
+import Token from "./token.js";
 
 import Log from "./src/lib/log.js";
 import Leet from "./src/leet.js";
@@ -14,16 +15,14 @@ import Moderate from "./src/moderate.js";
 
 import Static, { internalError } from "./src/static.js";
 
-import { SafeRegExp } from "./src/lib/util.js";
-
 export const Config = {
     version: "4.0.0",
     shouldUpdate: false,
     adminId: 515443305,
     groupId: 212137299,
     startTimestamp: new Date(),
-    service_token: "***",
-    access_token: "***",
+    service_token: Token.ServiceToken,
+    access_token: Token.AccessToken,
     oauth_url: `https://oauth.vk.com/authorize?client_id=8150055&display=page&redirect_uri=&scope=stories,photos,app_widget,docs,manage&response_type=token&v=5.131`
 }
 
@@ -124,10 +123,8 @@ const Bot = new API({
 
             var isHookTriggered = false;
             const useCommand = (command, cb) => {
-                const safe = new RegExp(
-                    `^(\/|!)(д|d) ` + SafeRegExp.parse(command), 
-                    "ig"
-                );
+                let wrap = `^(@bot.dolbaelb)?(\/|!)(д|d) ${command}`;
+                const safe = new RegExp(wrap, "ig");
 
                 if (safe.test(text) && !isHookTriggered) {
                     isHookTriggered = true;

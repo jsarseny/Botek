@@ -4,11 +4,9 @@
  * @param {string} flags native regexp flags
  */
 export class SafeRegExp extends RegExp {
-    safeWrapper = text => text.replace(/[\^|\$|\.|\*|\+|\?|\=|\!|\:|\|\\|\/|\(|\)|\[|\]|\{|\}]/ig, "\\$&");
-
     constructor(pattern, flags) {
         try {
-            pattern = this.safeWrapper(pattern);
+            pattern = pattern.replace(/[\^|\$|\.|\*|\+|\?|\=|\!|\:|\|\\|\/|\(|\)|\[|\]|\{|\}]/ig, "\\$&");
 
             super(pattern, flags);
         } catch (err) {

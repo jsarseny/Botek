@@ -1,10 +1,12 @@
 import restler from "restler";
 
+import Token from "../token.js";
+
 import { callLimitExceeded } from "./static.js";
 import { sliceCommandPart, upperFirst } from "./lib/util.js";
 
 const WEATHER_CALL_LIMIT = 58; // per min
-const WEATHER_API_KEY = "cca2238b3b47b33135b3e16f85d17142";
+const WEATHER_API_KEY = Token.OpenweathermapToken;
 const WEATHER_CACHE = {
     perMinute: 0,
     byPeerId: {}
