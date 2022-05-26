@@ -19,6 +19,8 @@ MongoClient.connect(async function(err, client) {
 });
 
 const CURRENT_VERSION = "v4";
+const CURRENT_JOKES_BUNDLE = "jokes_bundle_v1";
+
 const getCurrent = async () => {
     return await Mongo.Main.findOne({ "name": CURRENT_VERSION });
 }
@@ -26,6 +28,12 @@ const getCurrent = async () => {
 const DataBase = {
     get c() {
         return Mongo.Main;
+    },
+
+    async getJokes() {
+        var bundle = await Mongo.Main.findOne({ "name": CURRENT_JOKES_BUNDLE });
+
+        return bundle.value;
     },
 
     async getWords() {

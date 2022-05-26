@@ -1,9 +1,9 @@
 import API from "node-vk-bot-api";
-import Token from "./token.js";
 
 import Log from "./src/lib/log.js";
 import Leet from "./src/leet.js";
 import Sound from "./src/sound.js";
+import Token from "./token.js";
 import Images from "./src/image.js";
 import Neural from "./src/neural.js";
 import Syntax from "./src/syntax.js";
@@ -16,7 +16,7 @@ import Moderate from "./src/moderate.js";
 import Static, { internalError } from "./src/static.js";
 
 export const Config = {
-    version: "4.0.0",
+    version: "4.25.0",
     shouldUpdate: false,
     adminId: 515443305,
     groupId: 212137299,
@@ -135,25 +135,27 @@ const Bot = new API({
             }
 
             const available = {
+                stat: getStatistic,
                 rnd: Syntax.generateRandom,
                 img: Syntax.generatePicture,
-                stat: getStatistic,
-                moder: ctx => Moderate.handleMessage(ctx),
                 aud: ctx => Sound.command(ctx),
                 help: ctx => ctx.reply(Static.Help),
+                moder: ctx => Moderate.handleMessage(ctx),
 
+                "(цитата|quote)": ctx => Images.buildQuote(ctx),
+                "(adv(ice)?)|(эдв(айс)?)": ctx => Images.buildAdvice(ctx),
                 "(jp(e)?g|(д)?ж(и)?п(е)?г)": ctx => Images.buildLowQuality(ctx),
                 "(dem(otivator)?)|(дем(отиватор)?)": ctx => Images.buildDemotivator(ctx),
-                "(adv(ice)?)|(эдв(айс)?)": ctx => Images.buildAdvice(ctx),
-                "(цитата|quote)": ctx => Images.buildQuote(ctx),
+                "(concat(enate)?|конкат(енир(овать|уй))?)": ctx => Images.buildConcat(ctx),
 
                 "(1337|leet)": ctx => Leet.command(ctx, "1337"),
                 "(lame|l4m3)": ctx => Leet.command(ctx, "lame"),
 
-                "(wi|wiki|((что|кто) (так(ое|ой|ая|ие)|значит)|(what|who) is)) ([^\\s]){1,}": ctx => Syntax.getShortExplore(ctx),
+                "word": ctx => Sentence.buildRandom(ctx),
                 "(math|вычисли)": ctx => Syntax.math(ctx),
                 "(weather|погода)": ctx => Explore.getCurrentWeather(ctx),
-                "word": ctx => Sentence.buildRandom(ctx)
+                "(anecdote|joke|анек(дот)?|прикол)": ctx => Syntax.getJoke(ctx),
+                "(wi|wiki|((что|кто) (так(ое|ой|ая|ие)|значит)|(what|who) is)) ([^\\s]){1,}": ctx => Syntax.getShortExplore(ctx),
             }
 
             Object.keys(available).map(command => {

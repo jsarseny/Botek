@@ -228,6 +228,48 @@ const Images = {
         return this.defaultUpload(canvas, ctx);
     },
 
+    async buildConcat(ctx) {
+        const DEFAULT_EXPONENT = 70;
+        const errorMessage = (
+            `/d concat <степень> - Конкатенировать изображения:\n\n`
+            + `• Прикрепите от 2 до 4 изображений, бот наложит их друг на друга\n`
+            + `• Используйте параметр <степень>, для изменение прозрачности накладываемых изображений (число 0 - 100, 70 по умолчанию)`
+        );
+
+        var exponent = Number.parseInt(
+            sliceCommandPart(ctx, 0, 2, true)[0]
+        );
+        
+        if (Number.isNaN(exponent) || exponent < 0 || exponent > 100) {
+            exponent = DEFAULT_EXPONENT;
+        }
+
+        var attachments = getTypedAttachments(ctx.message, "photo", true).slice(0, 4);
+        if (attachments.length < 2) return ctx.reply(errorMessage);
+
+        const source = getMaxPhotoSize(attachments[0].photo.sizes);
+
+        const canvas = createCanvas(source.width, source.height);
+        const context = canvas.getContext("2d");
+
+        context.drawImage(
+            await loadImage(source.url), 
+            0, 0, canvas.width, canvas.height
+        );
+
+        for (var i = 1; i < attachments.length; i++) {
+            let { url } = getMaxPhotoSize(attachments[i].photo.sizes);
+            let cur = await loadImage(url);
+
+            context.globalAlpha = exponent / 100;
+            context.drawImage(cur, 0, 0, canvas.width, canvas.height);
+        }
+
+        context.globalAlpha = 1;
+
+        return this.defaultUpload(canvas, ctx);
+    },
+
     buildRandomPatternImage() {
         const canvasSize = 650;
         const canvas = createCanvas(canvasSize, canvasSize);

@@ -147,6 +147,13 @@ const Syntax = {
         );
     },
 
+    async getJoke(ctx) {
+        const bundle = await DataBase.getJokes();
+        const current = randomElement(bundle);
+
+        return ctx.reply(current);
+    },
+
     async getShortExplore(ctx) {
         const { text, peer_id, id } = ctx.message;
 
