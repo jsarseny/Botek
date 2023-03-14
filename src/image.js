@@ -13,7 +13,10 @@ const {
 
 const randomHex = () => `#${Math.floor(Math.random() * 16777215).toString(16)}`;
 
-registerFont("src/assets/Caveat-Regular.ttf", { family: "Caveat" });
+// connect custom fonts
+registerFont("../src/assets/Caveat-Regular.ttf", { family: "Caveat" });
+registerFont("../src/assets/Roboto-Regular.ttf", { family: "Roboto", weight: "regular" });
+registerFont("../src/assets/Roboto-Bold.ttf", { family: "Roboto", weight: "bold" });
 
 const Images = {
     defaultUpload: async (canvas, ctx) => {
@@ -178,7 +181,7 @@ const Images = {
         if (attachment) cover = getMaxPhotoSize(attachment.photo.sizes).url;
         if (!attachment || !author) {
             let isFromBot = sourceMessage.from_id < 0;
-            let profile = isFromBot ? await VK.getGroup(sourceMessage.from_id) : await VK.getUser(sourceMessage.from_id);
+            let profile = isFromBot ? await VK.getGroup(sourceMessage.from_id) : await VK.getUser(sourceMessage.from_id, "photo_200");
 
             let [ name, surname ] = [
                 !isFromBot ? profile.first_name : profile.name,
@@ -201,7 +204,7 @@ const Images = {
         context.fillRect(0, 0, canvas.width, canvas.height);
 
         const imageBuffer = await loadImage(cover);
-        context.drawRoundedImage(imageBuffer, 100, padding, padding, imageSize, imageSize);
+        context.drawRoundedImage(imageBuffer, imageSize / 2, padding, padding, imageSize, imageSize);
 
         context.fillStyle = "#FFF";
         context.font = `${fontSize}px Caveat`;
@@ -268,6 +271,105 @@ const Images = {
         context.globalAlpha = 1;
 
         return this.defaultUpload(canvas, ctx);
+    },
+
+    async buildScreenshoot(ctx) {
+        const {
+            reply_message, fwd_messages
+        } = ctx.message;
+
+        var target_messages = [];
+        const errorMessage = (
+            `Скриншот переписки\n\n`
+            + `Чтобы сделать скриншот, перешлите нужные сообщения\n`
+            + `/d screen`
+        );
+
+        if (!reply_message && !fwd_messages.length) return ctx.reply(errorMessage);
+
+        if (reply_message) target_messages = target_messages.concat([ reply_message ]);
+        if (fwd_messages) target_messages = target_messages.concat(fwd_messages);
+
+        const cache = {
+            _: new Map(),
+
+            async getRenderState(id) {
+                var state = this._.get(id);
+                if (state) return state;
+
+                var subject = null;
+                if (id >= 0) subject = await VK.getUser(id, "photo_50");
+                else subject = await VK.getGroup(id);
+
+                var avatarBuffer = await loadImage(subject.photo_50);
+                const cur = { avatarBuffer, subject }
+
+                this._.set(id, cur);
+                return cur;
+            }
+        }
+
+        var padding = 20;
+        var fontSize = 19;
+        var imageSize = 50;
+
+        var width = 600;
+        var height = 32000;
+
+        const canvas = createCanvas(width, height);
+        const context = canvas.getContext("2d");
+
+        var marginY = padding;
+        var lastId = 0;
+
+        for (var i = 0; i < target_messages.length; i++) {
+            let { from_id, text, date } = target_messages[i];
+            let { avatarBuffer, subject } = await cache.getRenderState(from_id);
+            let shouldDrawFrame = from_id !== lastId;
+
+            // render avatar
+            if (shouldDrawFrame) context.drawRoundedImage(
+                avatarBuffer, imageSize / 2,
+                padding, marginY, 
+                imageSize, imageSize
+            );
+
+            // render sender name
+            let contentX = 1.8 * padding + imageSize;
+            let nameY = marginY + imageSize / 2.5;
+            let textY = shouldDrawFrame ? nameY + fontSize * 1.25 : nameY;
+
+            if (shouldDrawFrame) {
+                let fullname = from_id < 0 ? subject.name : `${subject.first_name} ${subject.last_name}`;
+
+                context.fillStyle = "#2a5885";
+                context.font = `700 ${fontSize}px Roboto`;
+                context.fillText(fullname, contentX, nameY);
+            }
+
+            // render text
+            context.fillStyle = "#000";
+            context.font = `${fontSize}px Roboto`;
+
+            var rendered = renderLines(context, text, {
+                maxWidth: canvas.width - (contentX + padding),
+                startX: contentX,
+                startY: textY,
+                fontSize
+            });
+
+            lastId = from_id;
+            marginY = rendered.offsetTop + rendered.offsetHeight;
+        }
+
+        let currentHeight = marginY + padding / 2;
+        const data = context.getImageData(0, 0, width, currentHeight);
+
+        const resultCanvas = createCanvas(canvas.width, currentHeight);
+        const resultContext = resultCanvas.getContext("2d");
+        resultContext.putImageData(data, 0, 0);
+
+        return this.defaultUpload(resultCanvas, ctx);
     },
 
     buildRandomPatternImage() {
@@ -446,7 +548,10 @@ export const splitLines = (ctx, text, maxWidth, asArray = false) => {
         var width = ctx.measureText(currentLine + " " + word).width;
 
         if (width < maxWidth) currentLine += " " + word;
-        else lines.push(currentLine), currentLine = word;
+        else {
+            lines.push(currentLine);
+            currentLine = word;
+        }
     }
 
     lines.push(currentLine);
@@ -468,6 +573,13 @@ export const renderLines = (ctx, text, preferens) => {
     const lines = splitLines(ctx, text, preferens.maxWidth, true);
     if (preferens.shouldInvert) lines.reverse();
 
+    const abstract =  { 
+        offsetLeft: preferens.startX, 
+        offsetTop: preferens.startY, 
+        offsetWidth: preferens.maxWidth, 
+        offsetHeight: preferens.fontSize * lines.length 
+    };
+
     lines.map((line, i) => {
         let marginY = preferens.startY + preferens.fontSize * i;
         let marginX = preferens.startX;
@@ -480,6 +592,8 @@ export const renderLines = (ctx, text, preferens) => {
             ctx.strokeText(line, marginX, marginY);
         }
     });
+
+    return abstract;
 }
 
 export const getPercentPart = (int, percent) => int * percent / 100;

@@ -3,7 +3,7 @@ import Log from "./lib/log.js";
 import Syntax from "./syntax.js";
 import DataBase from "./lib/db.js";
 
-import { Config } from "../bot.mjs";
+import { Config } from "../VK/bot.mjs";
 import { fileSize } from "./lib/util.js";
 import { internalError } from "./static.js";
 

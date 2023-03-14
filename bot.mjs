@@ -1,19 +1,19 @@
 import API from "node-vk-bot-api";
 
-import Log from "./src/lib/log.js";
-import Leet from "./src/leet.js";
-import Sound from "./src/sound.js";
-import Token from "./token.js";
-import Images from "./src/image.js";
-import Neural from "./src/neural.js";
-import Syntax from "./src/syntax.js";
-import Update from "./src/lib/update.js";
-import Explore from "./src/explore.js";
-import DataBase from "./src/lib/db.js";
-import Sentence from "./src/sentence.js";
-import Moderate from "./src/moderate.js";
+import Log from "../src/lib/log.js";
+import Leet from "../src/leet.js";
+import Sound from "../src/sound.js";
+import Token from "../token.js";
+import Images from "../src/image.js";
+import Neural from "../src/neural.js";
+import Syntax from "../src/syntax.js";
+import Update from "../src/lib/update.js";
+import Explore from "../src/explore.js";
+import DataBase from "../src/lib/db.js";
+import Sentence from "../src/sentence.js";
+import Moderate from "../src/moderate.js";
 
-import Static, { internalError } from "./src/static.js";
+import Static, { internalError } from "../src/static.js";
 
 export const Config = {
     version: "4.25.0",
@@ -130,7 +130,7 @@ const Bot = new API({
                     isHookTriggered = true;
                     return cb(ctx);
                 }
-
+                
                 return false;
             }
 
@@ -138,13 +138,16 @@ const Bot = new API({
                 stat: getStatistic,
                 rnd: Syntax.generateRandom,
                 img: Syntax.generatePicture,
-                aud: ctx => Sound.command(ctx),
                 help: ctx => ctx.reply(Static.Help),
                 moder: ctx => Moderate.handleMessage(ctx),
+
+                "(aud(io)?|rec(ord)?|скажи)": ctx => Sound.command(ctx),
+                "басы": ctx => Sound.buildBassboost(ctx),
 
                 "(цитата|quote)": ctx => Images.buildQuote(ctx),
                 "(adv(ice)?)|(эдв(айс)?)": ctx => Images.buildAdvice(ctx),
                 "(jp(e)?g|(д)?ж(и)?п(е)?г)": ctx => Images.buildLowQuality(ctx),
+                "(screen(shot)?|скрин(шот)?)": ctx => Images.buildScreenshoot(ctx),
                 "(dem(otivator)?)|(дем(отиватор)?)": ctx => Images.buildDemotivator(ctx),
                 "(concat(enate)?|конкат(енир(овать|уй))?)": ctx => Images.buildConcat(ctx),
 

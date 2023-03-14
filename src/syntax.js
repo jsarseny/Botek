@@ -1,8 +1,8 @@
 import Morphy from "phpmorphy";
 import Markup from "node-vk-bot-api/lib/markup.js";
 
-import VK from "./vk.js"
-import Bot from "../bot.mjs";
+import VK from "./vk.js";
+import Bot from "../VK/bot.mjs";
 import Explore from "./explore.js";
 import DataBase from "./lib/db.js";
 import Sentence from "./sentence.js";

@@ -1,7 +1,7 @@
 import Canvas from "canvas";
 
 import VK from "../vk.js";
-import Bot from "../../bot.mjs";
+import Bot from "../../VK/bot.mjs";
 import DataBase from "./db.js";
 import Sentence from "../sentence.js";
 

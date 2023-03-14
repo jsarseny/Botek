@@ -1,12 +1,12 @@
 import restler from "restler";
-import Bot, { Config } from "../bot.mjs";
+import Bot, { Config } from "../VK/bot.mjs";
 
 // The helpers of heavy VK API methods
 const VK = {
-    async getUser(userId) {
+    async getUser(userId, fields) {
         const callApi = await Bot.execute("users.get", {
             user_ids: userId,
-            fields: "photo_200"
+            fields: fields || ""
         });
 
         if (callApi.length < 2) return callApi[0];
@@ -55,7 +55,12 @@ const VK = {
             }); 
         });
     },
-    async uploadAudio(buffer, peer_id) {
+    async uploadAudio(buffer, peer_id, opts = {}) {
+        opts = {
+            type: opts.type || "audio/mpeg",
+            ext: opts.ext || "mp3"
+        }
+
         const server = await Bot.execute("docs.getMessagesUploadServer", {
             type: "audio_message",
             peer_id: peer_id,
@@ -65,7 +70,7 @@ const VK = {
             restler.post(server.upload_url, {
                 multipart: true,
                 data: {
-                    file: restler.data("upload.mp3", "audio/mpeg", buffer)
+                    file: restler.data(`upload.${opts.ext}`, opts.type, buffer)
                 }
             }).on("complete", async function(data) {
                 if (!data) return resolve({ error: true });
