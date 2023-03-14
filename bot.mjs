@@ -163,7 +163,7 @@ const Bot = new API({
 
             Object.keys(available).map(command => {
                 if (isHookTriggered) return;
-                useCommand(command, available[command])
+                useCommand(command, available[command]);
             });
 
             if (!isHookTriggered) return buildSentence(ctx);
